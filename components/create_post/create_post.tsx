@@ -1464,10 +1464,7 @@ class CreatePost extends React.PureComponent<Props, State> {
                             'post-action--active': this.state.showEmojiPicker,
                         })}
                     >
-                        <EmojiIcon
-                            id='emojiPickerButton'
-                            className={'icon icon--emoji '}
-                        />
+                        <i className='icon icon-emoticon-happy-outline'/>
                     </button>
                 </div>
             );
