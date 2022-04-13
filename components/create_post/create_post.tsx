@@ -1424,6 +1424,7 @@ class CreatePost extends React.PureComponent<Props, State> {
                     onClick={() => {
                         this.setState({showFormat: !this.state.showFormat});
                     }}
+                    active={this.state.showFormat}
                 />
             );
             toggleFormattingBar = (
@@ -1433,6 +1434,7 @@ class CreatePost extends React.PureComponent<Props, State> {
                             isFormattingBarVisible: !this.state.isFormattingBarVisible,
                         });
                     }}
+                    active={this.state.isFormattingBarVisible}
                 />
             );
         }
