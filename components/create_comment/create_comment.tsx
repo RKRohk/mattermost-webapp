@@ -13,7 +13,8 @@ import {sortFileInfos} from 'mattermost-redux/utils/file_utils';
 
 import * as GlobalActions from 'actions/global_actions';
 
-import Constants, {Locations, ModalIdentifiers} from 'utils/constants';
+import Constants, {AdvancedTextEditor, Locations, ModalIdentifiers, Preferences} from 'utils/constants';
+import {PreferenceType} from '@mattermost/types/preferences';
 import * as UserAgent from 'utils/user_agent';
 import * as Utils from 'utils/utils';
 import {
@@ -70,6 +71,8 @@ type Props = {
          * The channel for which this comment is a part of
          */
     channelId: string;
+
+    currentUserId: string;
 
     /**
       * The number of channel members
@@ -252,9 +255,11 @@ type Props = {
     focusOnMount?: boolean;
     isThreadView?: boolean;
     openModal: <P>(modalData: ModalData<P>) => void;
+    savePreferences: (userId: string, preferences: PreferenceType[]) => ActionResult;
     useCustomGroupMentions: boolean;
     emojiMap: EmojiMap;
     markdownPreviewFeatureIsEnabled: boolean;
+    isFormattingBarVisible: boolean;
 }
 
 type State = {
@@ -317,7 +322,7 @@ class CreateComment extends React.PureComponent<Props, State> {
             errorClass: null,
             serverError: null,
             showFormat: false,
-            isFormattingBarVisible: false,
+            isFormattingBarVisible: props.isFormattingBarVisible,
         };
 
         this.textboxRef = React.createRef();
@@ -1076,6 +1081,19 @@ class CreateComment extends React.PureComponent<Props, State> {
         return this.createCommentControlsRef.current;
     }
 
+    toggleAdvanceTextEditor = () => {
+        this.setState({
+            isFormattingBarVisible:
+                !this.state.isFormattingBarVisible,
+        });
+        this.props.savePreferences(this.props.currentUserId, [{
+            category: Preferences.ADVANCED_TEXT_EDITOR,
+            user_id: this.props.currentUserId,
+            name: AdvancedTextEditor.COMMENT,
+            value: String(!this.state.isFormattingBarVisible),
+        }]);
+    }
+
     focusTextbox = (keepFocus = false) => {
         if (this.textboxRef.current && (keepFocus || !UserAgent.isMobile())) {
             this.textboxRef.current.focus();
@@ -1209,12 +1227,7 @@ class CreateComment extends React.PureComponent<Props, State> {
             );
             toggleFormattingBar = (
                 <ToggleFormattingBar
-                    onClick={() => {
-                        this.setState({
-                            isFormattingBarVisible:
-                                !this.state.isFormattingBarVisible,
-                        });
-                    }}
+                    onClick={this.toggleAdvanceTextEditor}
                     active={this.state.isFormattingBarVisible}
                 />
             );
